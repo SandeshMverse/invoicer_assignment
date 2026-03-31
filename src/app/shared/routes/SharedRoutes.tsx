@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Products from "../../modules/masters/products/Products";
 import Discount from "../../modules/masters/discount/Discount";
 import AddProduct from "../../modules/masters/products/modify/AddProduct";
@@ -8,6 +8,7 @@ import Invoice from "../../modules/operations/Invoice";
 const SharedRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/invoice" replace />} />
       <Route path="/invoice" element={<Invoice />} />
 
       <Route path="/products" element={<Products />} />

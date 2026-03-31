@@ -1,10 +1,11 @@
-export interface Discount {
+export interface DiscountType {
     id?: string;
     name: string;
     percentage: number;
 }
 
 export interface DiscountState {
-    list: Discount[];
+    list: DiscountType[];
     loading: boolean;
+    error?: string;
 }

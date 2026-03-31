@@ -1,44 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import AppTable from "../../../shared/components/table/AppTable";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AppTable from "../../../shared/components/table/AppTable";
 import { discountTableConfig } from "./discountTableConfig";
+import { fetchDiscounts, removeDiscount } from "./discountSlice";
+import { DiscountState, DiscountType } from "./discountTypes"; // type-only import
+import { RootState } from "../../config/store";
 
 const Discount = () => {
-  const [discount, setDiscount] = useState<any[]>([]);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const fetchDiscount = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "discounts"));
-      console.log("QuerySnapshot size:", querySnapshot.size);
-
-      const data: any[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      console.log("Fetched discount:", JSON.stringify(data));
-      setDiscount(data);
-    } catch (error) {
-      console.error("Error fetching discount:", error);
-    }
-  };
+  const { list, loading, error } = useSelector(
+    (state: RootState) => state.discounts as DiscountState,
+  );
 
   useEffect(() => {
-    fetchDiscount();
-  }, []);
+    dispatch(fetchDiscounts() as any);
+  }, [dispatch]);
 
-  const handleActionClick = (action: string, row: any) => {
-    console.log(action, row);
+  const handleActionClick = (action: string, row: DiscountType) => {
     if (action === "delete") {
-      if (!window.confirm("Are you sure you want to delete this product?"))
-        return;
-      handleDelete(row.id);
-    } else {
-      toast.error("Action not implemented yet.");
+      if (window.confirm("Are you sure you want to delete this discount?")) {
+        dispatch(removeDiscount(row.id!) as any)
+          .then(() => toast.success("Discount deleted successfully"))
+          .catch(() => toast.error("Failed to delete discount"));
+      }
+    } else if (action === "edit") {
+      navigate(`/discount/edit/${row.id}`);
+    } else if (action === "view") {
+      navigate(`/discount/view/${row.id}`);
     }
   };
 
@@ -46,26 +38,14 @@ const Discount = () => {
     navigate("/discount/add");
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
-    try {
-      await deleteDoc(doc(db, "discounts", id));
-      toast.success("Product deleted successfully!");
-      fetchDiscount();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete product.");
-    }
-  };
-
   return (
     <div className="m-3">
-      <h3 className="text mb-3">Discount List</h3>
+      <h3 className="mb-3">Discount List</h3>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-danger">{error}</p>}
       <AppTable
         tableConfig={discountTableConfig}
-        tableData={discount}
+        tableData={list}
         onActionClick={handleActionClick}
         onCreate={handleCreate}
       />

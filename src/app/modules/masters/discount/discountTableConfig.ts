@@ -13,7 +13,7 @@ export const discountTableConfig: RowData = {
             buttonNames: ["edit", "view", "delete"],
         },
     ],
-    dataKey: "id", 
+    dataKey: "id",
     buttonname: "Add Discount",
     button: false,
 };

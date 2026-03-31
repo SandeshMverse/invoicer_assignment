@@ -37,6 +37,8 @@ const Products = () => {
       if (!window.confirm("Are you sure you want to delete this product?"))
         return;
       handleDelete(row.id);
+    } else if (action === "edit") {
+      navigate(`/products/edit/${row.id}`);
     } else {
       toast.error("Action not implemented yet.");
     }

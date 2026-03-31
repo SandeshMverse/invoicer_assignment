@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { useDispatch } from "react-redux";
 import AppForm from "../../../../shared/components/form/AppForm";
 import { productForm as initialForm } from "./productForm";
+import { createProductThunk } from "../productSlice";
+import { getDocs, collection } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
   const [productForm, setProductForm] = useState(initialForm);
 
-  // Fetch discounts on mount
   useEffect(() => {
     const fetchDiscounts = async () => {
       try {
         const discountSnapshot = await getDocs(collection(db, "discounts"));
         const discountOptions = discountSnapshot.docs.map((doc) => ({
-          label: doc.data().name, 
-          value: doc.id, 
+          label: doc.data().name,
+          value: doc.id,
         }));
 
-        console.log("Fetched discounts:", discountOptions);
-
-        // Update productForm with discount options
         const updatedForm = initialForm.map((field) =>
           field.name === "discount"
             ? { ...field, options: discountOptions }
@@ -40,16 +39,18 @@ const AddProduct = () => {
 
   const handleSubmit = async (data: any) => {
     try {
-      await addDoc(collection(db, "items"), {
+      const payload = {
         ...data,
         price: parseFloat(data.price),
         discount: parseFloat(data.discount),
-      });
+      };
+
+      await dispatch(createProductThunk(payload)).unwrap();
       toast.success("Product added successfully!");
       navigate("/products");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to add product.");
+      toast.error(err.message || "Failed to add product.");
     }
   };
 

@@ -5,7 +5,6 @@ export interface Product {
     discount: number;
     description?: string;
 }
-
 export interface ProductState {
     list: Product[];
     loading: boolean;

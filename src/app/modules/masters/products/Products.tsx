@@ -1,73 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import AppTable from "../../../shared/components/table/AppTable";
-import { productTableConfig } from "./productTableConfig";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AppTable from "../../../shared/components/table/AppTable";
+import { productTableConfig } from "./productTableConfig";
+import type { Product } from "./productTypes";
+import { fetchProducts, deleteProductThunk } from "./productSlice";
+import { RootState } from "../../config/store";
 
 const Products = () => {
-  const [products, setProducts] = useState<any[]>([]);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const fetchProducts = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "items"));
-      console.log("QuerySnapshot size:", querySnapshot.size);
-
-      const data: any[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      console.log("Fetched products:", JSON.stringify(data));
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
+  const { list, loading, error } = useSelector((state: RootState) => state.products);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    dispatch(fetchProducts() as any);
+  }, [dispatch]);
 
-  const handleActionClick = (action: string, row: any) => {
-    console.log(action, row);
+  const handleActionClick = (action: string, row: Product) => {
     if (action === "delete") {
-      if (!window.confirm("Are you sure you want to delete this product?"))
-        return;
-      handleDelete(row.id);
+      if (window.confirm("Are you sure you want to delete this product?")) {
+        dispatch(deleteProductThunk(row.id!) as any)
+          .then(() => toast.success("Product deleted successfully"))
+          .catch(() => toast.error("Failed to delete product"));
+      }
     } else if (action === "edit") {
       navigate(`/products/edit/${row.id}`);
-    } else {
-      toast.error("Action not implemented yet.");
+    } else if (action === "view") {
+      navigate(`/products/view/${row.id}`);
     }
   };
 
-  const handleCreate = () => {
-    navigate("/products/add");
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
-    try {
-      await deleteDoc(doc(db, "items", id));
-      toast.success("Product deleted successfully!");
-      fetchProducts();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete product.");
-    }
-  };
+  const handleCreate = () => navigate("/products/add");
 
   return (
     <div className="m-3">
-      <h3 className="text mb-3">Products List</h3>
+      <h3 className="mb-3">Products List</h3>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-danger">{error}</p>}
       <AppTable
         tableConfig={productTableConfig}
-        tableData={products}
+        tableData={list}
         onActionClick={handleActionClick}
         onCreate={handleCreate}
       />

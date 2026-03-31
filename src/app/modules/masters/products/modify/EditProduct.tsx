@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { doc, getDoc, setDoc, getDocs, collection } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { useDispatch } from "react-redux";
 import AppForm from "../../../../shared/components/form/AppForm";
 import { productForm as initialForm } from "./productForm";
+import { updateProductThunk } from "../productSlice";
+import { getDocs, collection, doc, getDoc } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 
 const EditProduct = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
   const { id } = useParams();
   const [productForm, setProductForm] = useState(initialForm);
   const [loading, setLoading] = useState(true);
@@ -23,13 +26,16 @@ const EditProduct = () => {
 
         const docRef = doc(db, "items", id!);
         const docSnap = await getDoc(docRef);
+
         if (!docSnap.exists()) {
           toast.error("Product not found.");
           navigate("/products");
           return;
         }
+
         const productData = docSnap.data();
 
+        // Map product data to form fields
         const updatedForm = initialForm.map((field) => {
           if (field.name === "discount") {
             return {
@@ -37,9 +43,8 @@ const EditProduct = () => {
               options: discountOptions,
               value: productData.discount || "",
             };
-          } else {
-            return { ...field, value: productData[field.name] || "" };
           }
+          return { ...field, value: productData[field.name] || "" };
         });
 
         setProductForm(updatedForm);
@@ -55,16 +60,18 @@ const EditProduct = () => {
 
   const handleSubmit = async (data: any) => {
     try {
-      await setDoc(doc(db, "items", id!), {
+      const payload = {
         ...data,
         price: parseFloat(data.price),
         discount: parseFloat(data.discount),
-      });
+      };
+
+      await dispatch(updateProductThunk({ id: id!, data: payload })).unwrap();
       toast.success("Product updated successfully!");
       navigate("/products");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to update product.");
+      toast.error(err.message || "Failed to update product.");
     }
   };
 

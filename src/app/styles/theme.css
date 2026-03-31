@@ -12,6 +12,10 @@
     color: #fff !important;
 }
 
+.bg-theme-primary {
+    background-color: var(--primary-color) !important;
+}
+
 .btn-outline-primary-custom {
     color: var(--primary-color) !important;
     border: 1px solid var(--primary-color) !important;

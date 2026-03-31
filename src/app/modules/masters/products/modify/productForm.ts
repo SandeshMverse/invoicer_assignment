@@ -1,0 +1,48 @@
+import { FormField } from "../../../../shared/components/form/formTypes";
+
+export const productForm: FormField[] = [
+  {
+    name: "name",
+    label: "Product Name",
+    placeholder: "Enter product name",
+    type: "text",
+    validation: "text",
+    value: "",
+    required: true,
+    disable: false,
+    colsize: "col-6 mb-3",
+  },
+  {
+    name: "price",
+    label: "Price",
+    placeholder: "Enter product price",
+    type: "number",
+    validation: "number",
+    value: 0,
+    required: true,
+    disable: false,
+    colsize: "col-6 mb-3",
+  },
+  {
+    name: "discount",
+    label: "Discount",
+    placeholder: "Select discount",
+    type: "dropdown",
+    options: [],
+    value: "",
+    required: false,
+    disable: false,
+    colsize: "col-6 mb-3",
+  },
+  {
+    name: "description",
+    label: "Description",
+    placeholder: "Enter product description",
+    type: "text",
+    validation: "text",
+    value: "",
+    required: false,
+    disable: false,
+    colsize: "col-6 mb-3",
+  },
+];

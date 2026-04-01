@@ -4,7 +4,7 @@ export const productTableConfig: RowData = {
     headers: [
         { label: "Sr.No", key: "sr_no", type: "autoIncrementNumber", size: "4%" },
         { label: "Name", key: "name" },
-        { label: "Price", key: "price" },
+        { label: "Price (£)", key: "price" },
         { label: "Discount", key: "discount" ,type: "checkdata"},
         { label: "Description", key: "description" },
         {

@@ -10,7 +10,7 @@ export const discountTableConfig: RowData = {
             key: "action",
             type: "action",
             size: "15%",
-            buttonNames: ["edit", "view", "delete"],
+            buttonNames: ["delete"],
         },
     ],
     dataKey: "id",

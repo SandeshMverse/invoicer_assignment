@@ -23,7 +23,7 @@ const InvoiceTable: React.FC<Props> = ({ items, onQuantityChange }) => {
           <tr key={item.id}>
             <td>{idx + 1}</td>
             <td>{item.name}</td>
-            <td>₹{item.price.toFixed(2)}</td>
+            <td>£{item.price.toFixed(2)}</td>
             <td>
               <input
                 type="number"
@@ -35,7 +35,7 @@ const InvoiceTable: React.FC<Props> = ({ items, onQuantityChange }) => {
                 }
               />
             </td>
-            <td>₹{item.amount.toFixed(2)}</td>
+            <td>£{item.amount.toFixed(2)}</td>
           </tr>
         ))}
       </tbody>

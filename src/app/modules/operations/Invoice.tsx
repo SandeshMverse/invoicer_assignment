@@ -114,7 +114,7 @@ const Invoice: React.FC = () => {
       body: tableData,
       theme: "grid",
       headStyles: {
-        fillColor: [30, 136, 229],
+        fillColor: [103, 195, 204],
         textColor: 255,
         fontStyle: "bold",
       },
